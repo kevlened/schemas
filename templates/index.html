@@ -1,0 +1,30 @@
+<!doctype html>
+<html ng-app="schemaApp">
+<head>
+    <title>My Angular App</title>
+    
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+    <script src="{{ url_for('static', filename='controllers.js') }}"></script>
+  </head>
+<body ng-controller="SchemaListCtrl">
+
+<script type="text/javascript">
+function AddNewDatabase(){
+	alert("yup");
+}
+</script>
+
+<h2><b>Schemas</b></h2>
+<ul>
+<li ng-repeat="db in dbs">
+      <a href="/schema/{[db.name]}">{[db.name]}</a>
+    </li>
+</ul>
+Type <input type="text" id="dbtype"></input> <br />
+Name <input type="text" id="dbname"></input><br />
+Password <input type="text" id="dbpassword"></input><br />
+Location <input type="text" id="dblocation"></input><br />
+<button onClick="AddNewDatabase()">Add</button>
+</body>
+</html>
