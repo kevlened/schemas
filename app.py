@@ -27,9 +27,24 @@ def schemas():
     session = DBSession()
     db = session.query(Database).all()
     
-    dbs = [d.name for d in db]
+    dbs = [{'name': d.name} for d in db]
     
     return json.dumps(dbs)
+
+@app.route("/add_schema", methods=['POST'])
+def add_schema():
+    
+    engine = create_engine('sqlite:///databases.db')
+    DBSession = sessionmaker(bind=engine)
+    
+    session = DBSession()
+    
+    db = json.loads(request.data)
+    new_db = Database(name=db['name'], engine=db['engine'], username=db['username'], password=db['password'], host=db['host'])
+    session.add(new_db)
+    session.commit()  
+    
+    return json.dumps(request.data)
 
 @app.route("/schemas/<db>")
 def schema(db):
@@ -152,8 +167,8 @@ if __name__ == "__main__":
         
         session = DBSession()
          
-        new_db = Database(name='Chinook_Sqlite.sqlite', engine='sqlite')
-        session.add(new_db)
+        #new_db = Database(name='Chinook_Sqlite.sqlite', engine='sqlite')
+        #session.add(new_db)
         session.commit()    
     
     app.run()

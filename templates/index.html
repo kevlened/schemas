@@ -21,11 +21,11 @@ function AddNewDatabase(){
       <a href="/schemas/{[db.name]}">{[db.name]}</a>
     </li>
 </ul>
-Engine <input type="text" id="dbengine"></input> <br />
-Name <input type="text" id="dbname"></input><br />
-Username <input type="text" id="dbusername"></input><br />
-Password <input type="text" id="dbpassword"></input><br />
-Host <input type="text" id="dbhost"></input><br />
-<button onClick="AddNewDatabase()">Add</button>
+Engine <input type="text" id="dbengine" ng-model='new.engine'></input> <br />
+Name <input type="text" id="dbname" ng-model='new.name'></input><br />
+Username <input type="text" id="dbusername" ng-model='new.username'></input><br />
+Password <input type="text" id="dbpassword" ng-model='new.password'></input><br />
+Host <input type="text" id="dbhost" ng-model='new.host'></input><br />
+<button ng-click="addDatabase()">Add</button>
 </body>
 </html>
