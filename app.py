@@ -5,10 +5,11 @@ from sqlalchemy import create_engine, MetaData
 from sadisplay import describe, render, __version__
 import pydot
 from sqlalchemy.engine.url import URL
-import json
+from sqlalchemy.orm import sessionmaker
+from models import Base, Database
+import json, os
 
 from flask import Flask, Markup, render_template, request
-from GoFourth import *
 
 app = Flask(__name__)
 
@@ -17,10 +18,45 @@ def index():
     
     return render_template('index.html')
 
-@app.route("/schema/<db>")
-def schema(db):
+@app.route("/schemas")
+def schemas():
+    # Identify the parameters for the database
+    engine = create_engine('sqlite:///databases.db')
+    Base.metadata.bind = engine  
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    db = session.query(Database).all()
     
-    url = str(URL("sqlite", database = 'Chinook_Sqlite.sqlite'))
+    dbs = [d.name for d in db]
+    
+    return json.dumps(dbs)
+
+@app.route("/schemas/<db>")
+def schema(db):
+    dot = get_dot_schema(db)
+    return render_template('viewer.html', dot_file=dot)
+
+@app.route("/schemas/<db>/dot")
+def dot_schema(db):
+    return get_dot_schema(db)    
+    
+def get_dot_schema(db):
+    # Identify the parameters for the database
+    engine = create_engine('sqlite:///databases.db')
+    Base.metadata.bind = engine  
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    db = session.query(Database).filter(Database.name == db).all()
+    
+    if len(db) == 1:
+        db = db[0]
+    elif len(db) == 0:
+        raise Exception("There are no databases identified by " + db) 
+    else:
+        raise Exception("There are multiple databases identified by " + db) 
+    
+    # Get the dot file
+    url = str(URL(db.engine, database = db.name))
     engine = create_engine(url)
     meta = MetaData()
 
@@ -34,17 +70,20 @@ def schema(db):
     #graph_file = json.dump(what)
     #return graph_file
     graph_file = to_dot(desc)
+#    with open('new.dot', 'w') as file:
+#        file.write(graph_file)
     with open('new.dot', 'w') as file:
         file.write(graph_file)
-    return render_template('viewer.html')
+    return graph_file
+    #return render_template('viewer.html')
 
 def to_dot(desc):
     
     result = ["""
     digraph G {
-        graph[overlap=false, splines=true]
+        graph[overlap=false, splines=true];
     
-        fontsize = 8
+        fontsize = 8;
 
         node [
             fontsize = 8
@@ -62,7 +101,7 @@ def to_dot(desc):
         "{name}" [label="{{\\
             {name}|\\
             {props}
-        }}"]
+        }}"];
     """
     
     COLUMN_PROPERTY_TEMPLATE = "{name} : {type}\\l\\"
@@ -79,11 +118,11 @@ def to_dot(desc):
 
         result.append(rendered)
 
-    EDGE_INHERIT = "\tedge [\n\t\tarrowhead = empty\n\t]"
-    INHERIT_TEMPLATE = "\t%(child)s -> %(parent)s \n"
+    EDGE_INHERIT = "\tedge [\n\t\tarrowhead = empty\n\t];"
+    INHERIT_TEMPLATE = "\t%(child)s -> %(parent)s; \n"
 
-    EDGE_REL = "\tedge [\n\t\tarrowhead = ediamond\n\t\tarrowtail = open\n\t]"
-    RELATION_TEMPLATE = "\t\"%(from)s\" -> \"%(to)s\" [label = \"%(by)s\"]"
+    EDGE_REL = "\tedge [\n\t\tarrowhead = odot\n\t\tarrowtail = crow\n\tdir = both\n\t];"
+    RELATION_TEMPLATE = "\t\"%(from)s\" -> \"%(to)s\" [label = \"%(by)s\"];"
 
     result += [EDGE_INHERIT]
     for item in inherits:
@@ -103,25 +142,18 @@ def to_dot(desc):
 if __name__ == "__main__":
     app.debug = True
     #schema("hey")
-    app.run()
     
-    
-    
-    url = str(URL("sqlite", database = 'Chinook_Sqlite.sqlite'))
-    engine = create_engine(url)
-    meta = MetaData()
-
-    meta.reflect(bind=engine)
-    
-    tables = set(meta.tables.keys())
-
-    desc = describe(map(lambda x: operator.getitem(meta.tables, x), tables))
-    graph_file = getattr(render, 'dot')(desc)    
+    if os.path.exists('databases.db'):
+        engine = create_engine('sqlite:///databases.db')
+    else:
+        engine = create_engine('sqlite:///databases.db')
+        Base.metadata.create_all(engine)
+        DBSession = sessionmaker(bind=engine)
         
-    with open('new.dot', 'w') as file:
-        file.write(graph_file)
+        session = DBSession()
+         
+        new_db = Database(name='Chinook_Sqlite.sqlite', engine='sqlite')
+        session.add(new_db)
+        session.commit()    
     
-    graph = pydot.Dot(graph_file)
-    graph = pydot.graph_from_dot_file('new.dot')
-    graph.write_png('somefile.png')
-    print "done"
+    app.run()

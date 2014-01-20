@@ -5,6 +5,6 @@ var schemaApp = angular.module('schemaApp', []).config(function($interpolateProv
  
 schemaApp.controller('SchemaListCtrl', function ($scope) {
   $scope.dbs = [
-  		{name:"sample"}
+  		{name:"Chinook_Sqlite.sqlite"}
   ];
 });

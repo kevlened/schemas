@@ -18,13 +18,14 @@ function AddNewDatabase(){
 <h2><b>Schemas</b></h2>
 <ul>
 <li ng-repeat="db in dbs">
-      <a href="/schema/{[db.name]}">{[db.name]}</a>
+      <a href="/schemas/{[db.name]}">{[db.name]}</a>
     </li>
 </ul>
-Type <input type="text" id="dbtype"></input> <br />
+Engine <input type="text" id="dbengine"></input> <br />
 Name <input type="text" id="dbname"></input><br />
+Username <input type="text" id="dbusername"></input><br />
 Password <input type="text" id="dbpassword"></input><br />
-Location <input type="text" id="dblocation"></input><br />
+Host <input type="text" id="dbhost"></input><br />
 <button onClick="AddNewDatabase()">Add</button>
 </body>
 </html>
