@@ -10,12 +10,19 @@ schemaApp.controller('SchemaListCtrl', function ($scope, $http) {
 	});
 	  
 	$scope.addDatabase = function() {
-		$http.post('add_schema', $scope.new).success(function(data) {
-			$scope.dbs.push({'name':$scope.new.name});
-			$scope.$apply();
-			return true;
+		$http.post('add_schema', $scope.new).success(function(success) {
+			if(success === true){
+				$scope.dbs.push({'name':$scope.new.name});
+			}
+			else{
+				alert('Could not add the database');
+			}
+			//$scope.$apply();
+			//return true;
 		});
 	}
+	
+	$scope.engines = ['sqlite','oracle','mysql','postgres','mssql'];
 	
 	$scope.new = {};
 	$scope.new.engine = '';

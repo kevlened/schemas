@@ -5,27 +5,21 @@
     
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
-    <script src="{{ url_for('static', filename='controllers.js') }}"></script>
   </head>
 <body ng-controller="SchemaListCtrl">
-
-<script type="text/javascript">
-function AddNewDatabase(){
-	alert("yup");
-}
-</script>
 
 <h2><b>Schemas</b></h2>
 <ul>
 <li ng-repeat="db in dbs">
-      <a href="/schemas/{[db.name]}">{[db.name]}</a>
+      <a href="/schemas/{[db.name]}">{[ db.name ]}</a>
     </li>
 </ul>
-Engine <input type="text" id="dbengine" ng-model='new.engine'></input> <br />
+Engine <select type="text" id="dbengine" ng-model='new.engine' ng-options="e for e in engines"></select> <br />
 Name <input type="text" id="dbname" ng-model='new.name'></input><br />
 Username <input type="text" id="dbusername" ng-model='new.username'></input><br />
 Password <input type="text" id="dbpassword" ng-model='new.password'></input><br />
 Host <input type="text" id="dbhost" ng-model='new.host'></input><br />
 <button ng-click="addDatabase()">Add</button>
+<script src="{{ url_for('static', filename='controllers.js') }}"></script>
 </body>
 </html>
