@@ -27,24 +27,38 @@ def schemas():
     session = DBSession()
     db = session.query(Database).all()
     
-    dbs = [{'name': d.name} for d in db]
+    dbs = [{'name': d.name,
+            'id': d.id,
+            'alias':d.alias,
+            'host':d.host,
+            'engine':d.engine} for d in db]
     
     return json.dumps(dbs)
 
 @app.route("/add_schema", methods=['POST'])
 def add_schema():
-    
     engine = create_engine('sqlite:///databases.db')
     DBSession = sessionmaker(bind=engine)
     
     session = DBSession()
     
     db = json.loads(request.data)
-    new_db = Database(name=db['name'], engine=db['engine'], username=db['username'], password=db['password'], host=db['host'])
+    if db['alias'] == '':
+        db['alias'] = db['name']
+
+    new_db = Database(name=db['name'], alias=db['alias'], engine=db['engine'], username=db['username'], password=db['password'], host=db['host'])
     session.add(new_db)
-    session.commit()  
+    session.commit()
     
-    return json.dumps(request.data)
+    
+    data = {'status': 'success',
+            'result':  {'name': new_db.name,
+                        'id': new_db.id,
+                        'alias': new_db.alias,
+                        'host': new_db.host,
+                        'engine': new_db.engine}
+            } 
+    return json.dumps(data)
 
 @app.route("/schemas/<db>")
 def schema(db):
@@ -61,14 +75,10 @@ def get_dot_schema(db):
     Base.metadata.bind = engine  
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    db = session.query(Database).filter(Database.name == db).all()
+    db = session.query(Database).filter(Database.id == db).first()
     
-    if len(db) == 1:
-        db = db[0]
-    elif len(db) == 0:
-        raise Exception("There are no databases identified by " + db) 
-    else:
-        raise Exception("There are multiple databases identified by " + db) 
+    if db is None:
+        raise Exception("There are no databases identified by " + db)
     
     # Get the dot file
     url = str(URL(db.engine, database = db.name))
@@ -80,17 +90,10 @@ def get_dot_schema(db):
     tables = set(meta.tables.keys())
 
     desc = describe(map(lambda x: operator.getitem(meta.tables, x), tables))
-    #graph_file = getattr(render, 'dot')(desc)
-    #what = json.loads(graph_file)
-    #graph_file = json.dump(what)
-    #return graph_file
     graph_file = to_dot(desc)
-#    with open('new.dot', 'w') as file:
-#        file.write(graph_file)
     with open('new.dot', 'w') as file:
         file.write(graph_file)
     return graph_file
-    #return render_template('viewer.html')
 
 def to_dot(desc):
     

@@ -11,11 +11,12 @@
 <h2><b>Schemas</b></h2>
 <ul>
 <li ng-repeat="db in dbs">
-      <a href="/schemas/{[db.name]}">{[ db.name ]}</a>
+      <a href="/schemas/{[db.id]}">{[ db.alias ]}</a>
     </li>
 </ul>
-Engine <select type="text" id="dbengine" ng-model='new.engine' ng-options="e for e in engines"></select> <br />
-Name <input type="text" id="dbname" ng-model='new.name'></input><br />
+Engine (required)<select type="text" id="dbengine" ng-model='new.engine' ng-options="e for e in engines"></select> <br />
+Alias <input type="text" id="dbalias" ng-model='new.alias'></input><br />
+Name (required)<input type="text" id="dbname" ng-model='new.name'></input><br />
 Username <input type="text" id="dbusername" ng-model='new.username'></input><br />
 Password <input type="text" id="dbpassword" ng-model='new.password'></input><br />
 Host <input type="text" id="dbhost" ng-model='new.host'></input><br />
