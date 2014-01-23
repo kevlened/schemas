@@ -11,6 +11,7 @@ class Database(Base):
     name = Column(String(250), nullable=False)
     alias = Column(String(250), nullable=True)
     host = Column(String(250), nullable=True)
+    port = Column(Integer, nullable=True)
     engine = Column(String(250), nullable=False)
     username = Column(String(250), nullable=True)
     password = Column(String(250), nullable=True)

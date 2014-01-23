@@ -31,4 +31,5 @@ schemaApp.controller('SchemaListCtrl', function ($scope, $http) {
 	$scope.new.username = '';
 	$scope.new.password = '';
 	$scope.new.host = '';
+	$scope.new.port = '';
 });

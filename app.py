@@ -46,7 +46,7 @@ def add_schema():
     if db['alias'] == '':
         db['alias'] = db['name']
 
-    new_db = Database(name=db['name'], alias=db['alias'], engine=db['engine'], username=db['username'], password=db['password'], host=db['host'])
+    new_db = Database(name=db['name'], alias=db['alias'], engine=db['engine'], username=db['username'], password=db['password'], host=db['host'], port=db['port'])
     session.add(new_db)
     session.commit()
     
@@ -56,6 +56,7 @@ def add_schema():
                         'id': new_db.id,
                         'alias': new_db.alias,
                         'host': new_db.host,
+                        'port': new_db.port,
                         'engine': new_db.engine}
             } 
     return json.dumps(data)
